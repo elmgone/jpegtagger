@@ -220,8 +220,26 @@ func ServeWui() {
 	// handle OPTIONS method
 	c.UseC(cors.New(cors.Options{OptionsPassthrough: true}).HandlerC)
 
+	//	// Bind the API under /api/ path
+	//	http.Handle("/api/", http.StripPrefix("/api/", c.Handler(api)))
+
 	// Bind the API under /api/ path
-	http.Handle("/api/", http.StripPrefix("/api/", c.Handler(api)))
+	hdlr := c.Handler(api)
+	loggingHdlr := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//		xlog.Debugf("req.Content-Type=%q", r.Header.Get("Content-Type"))
+		//		xlog.Debugf("req.mtd=%#v", r.Method)
+		//		xlog.Debugf("req.url=%#v", *r.URL)
+		//		xlog.Debugf("req.hdr=%#v", r.Header)
+		if r.URL.Path == "tags" && r.Method == "POST" && r.Header.Get("Content-Type") == "text/plain;charset=UTF-8" {
+			r.Header.Set("Content-Type", "application/json; charset=UTF-8")
+		}
+		hdlr.ServeHTTP(w, r)
+	})
+	http.Handle("/api/", http.StripPrefix("/api/", loggingHdlr))
+
+	//	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	//		h.ServeHTTPC(ctx, w, r)
+	//	})
 
 	http.HandleFunc("/", //-- "/index.html",
 		func(w http.ResponseWriter, r *http.Request) {

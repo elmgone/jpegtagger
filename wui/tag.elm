@@ -19,6 +19,7 @@ import Html.Attributes exposing (..)
 import Http exposing (..)
 import Task
 import Json.Decode
+import Json.Encode
 
 main =
   Html.program {
@@ -36,17 +37,18 @@ type alias Model =
   , editName : String
   -- , path : List String
   , errMsg : String
+  , id : String
   }
 
 init : (Model, Cmd Msg)
 init =
   (Model "blue" -- [ "color" ]
-   "" "", Cmd.none) -- getRandomGif "cats")
+   "" "" "", Cmd.none) -- getRandomGif "cats")
 
 
 -- UPDATE
 
-type Msg = Change
+type Msg = Create
   | EditName String
   --| SelectTopic String
   --| ChangeTopic String
@@ -56,8 +58,8 @@ type Msg = Change
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Change ->
-      ({ model | errMsg = "(changing tag ...)" }, createTag model.name)
+    Create ->
+      ({ model | errMsg = "(creating tag ...)" }, createTag model.name)
 
     EditName newName ->
       ({ model | editName = newName, errMsg = "" }, Cmd.none)
@@ -68,8 +70,8 @@ update msg model =
 --    ChangeTopic newTopic ->
 --      ({ model | topic = newTopic, editTopic = "", errMsg = "(changed topic)" }, getRandomGif newTopic)
 
-    CreateSucceed tagData ->
-      ({ model | errMsg = "(new tag: " ++ tagData ++ ")" }, Cmd.none)
+    CreateSucceed newId ->
+      ({ model | id = newId, errMsg = "(created tag " ++ newId ++ ")" }, Cmd.none)
 
     CreateFail err ->
         ({ model | errMsg = "!! FAILED to create tag !! " ++ (toString err) }, Cmd.none)
@@ -92,18 +94,62 @@ update msg model =
 
 
 createTag : String -> Cmd Msg
-createTag name =
+createTag tagName =
   let
     url =
 --      "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
-      "http://localhost:33333/api/tags" -- ++ name
+      "http://localhost:33333/api/tags" -- ++ tagName
+    bodyObj =
+      Json.Encode.object
+        [ ("name", Json.Encode.string tagName ) ]
+    bodyStr = Json.Encode.encode 2 bodyObj
   in
+{--
 --    Task.perform FetchFail FetchSucceed (Http.get decodeGifUrl url)
-    Task.perform CreateFail CreateSucceed (Http.getString url)
+--    Task.perform CreateFail CreateSucceed (Http.getString url)
+--    Task.perform CreateFail CreateSucceed (Http.post ( -- Json.Decode.list
+--                                                      Json.Decode.string) url (Http.string (Json.Encode.encode 2 bodyObj)))
+--}
+    Task.perform CreateFail CreateSucceed (Http.post ( Json.Decode.at ["id"] Json.Decode.string
+                                                     ) url (Http.string bodyStr))
+
+
+{--
+postJson : Json.Decoder value -> String -> Body -> Task Error value
+postJson decoder url body =
+  let request =
+        { verb = "POST"
+        , headers = []
+        , url = url
+        , body = body
+        }
+  in
+      fromJson decoder (send defaultSettings request)
+--}
+
+
+{--
+-- import Json.Decode (list, string)
+
+--hats : Task Error (List String)
+--hats =
+--    post (list string) "http://example.com/hat-categories.json" empty
+
+--person =
+--    object
+--      [ ("name", string "Tom")
+--      , ("age", int 42)
+--      ]
+
+--compact = encode 0 person
+---- {"name":"Tom","age":42}
+
+
 
 decodeGifUrl : Json.Decode.Decoder String
 decodeGifUrl =
   Json.Decode.at ["data", "image_url"] Json.Decode.string
+--}
 
 
 -- VIEW
@@ -117,7 +163,7 @@ view model =
         , td [] [ input [type' "text", value model.editName, onInput EditName ] [] ] ]
       , tr [] [ td [] [ -- img [src model.gifUrl] []
                 --,
-                        button [ onClick Change ] [ text "Change" ] ] ]
+                        button [ onClick Create ] [ text "Create" ] ] ]
 --      ,
 --      tr [] [ td []
 --        [ select []
