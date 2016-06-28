@@ -12,6 +12,8 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+module Tag exposing (Model)
+
 import Html exposing (..)
 import Html.App as Html
 import Html.Events exposing (..)

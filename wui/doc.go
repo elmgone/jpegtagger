@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate ./embedwui.sh
+//go:generate ./embedwui.sh Tags.elm
 
 package wui
