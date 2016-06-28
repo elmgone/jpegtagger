@@ -114,6 +114,51 @@ var (
 			},
 		},
 	}
+
+	// Define a post resource schema
+	tag = schema.Schema{
+		Fields: schema.Fields{
+			// schema.*Field are shortcuts for common fields (identical to users' same fields)
+			"id":      schema.IDField,
+			"created": schema.CreatedField,
+			"updated": schema.UpdatedField,
+			// Define a user field which references the user owning the post.
+			// See bellow, the content of this field is enforced by the fact
+			// that posts is a sub-resource of users.
+			"name": {
+				Required:   true,
+				Filterable: true,
+				//				Validator: &schema.Reference{
+				//					Path: "users",
+				//				},
+			},
+			//			"published": {
+			//				Filterable: true,
+			//				Validator:  &schema.Bool{},
+			//			},
+			// Sub-documents are handled via a sub-schema
+			//			"meta": {
+			//				Schema: &schema.Schema{
+			//					Fields: schema.Fields{
+			//						"title": {
+			//							Required: true,
+			//							Validator: &schema.String{
+			//								MaxLen: 150,
+			//							},
+			//						},
+			//						"body": {
+			//							// Dependency defines that body field can't be changed if
+			//							// the published field is not "false".
+			//							Dependency: schema.Q(`{"published": false}`),
+			//							Validator: &schema.String{
+			//								MaxLen: 100000,
+			//							},
+			//						},
+			//					},
+			//				},
+			//			},
+		},
+	}
 )
 
 func ServeWui() {
@@ -137,6 +182,13 @@ func ServeWui() {
 	// Add a friendly alias to public posts
 	// (equivalent to /users/:user_id/posts?filter={"published":true})
 	posts.Alias("public", url.Values{"filter": []string{"{\"published\":true}"}})
+
+	// Add a resource on /users[/:user_id]
+	/*tags :=*/ index.Bind("tags", tag, mem.NewHandler(), resource.Conf{
+		// We allow all REST methods
+		// (rest.ReadWrite is a shortcut for []resource.Mode{resource.Create, resource.Read, resource.Update, resource.Delete, resource,List})
+		AllowedModes: resource.ReadWrite,
+	})
 
 	// Create API HTTP handler for the resource graph
 	api, err := rest.NewHandler(index)
@@ -177,8 +229,8 @@ func ServeWui() {
 		})
 
 	// Serve it
-	log.Print("Serving API on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Print("Serving API on http://localhost:33333")
+	if err := http.ListenAndServe(":33333", nil); err != nil {
 		log.Fatal(err)
 	}
 }

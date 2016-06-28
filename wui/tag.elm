@@ -32,48 +32,48 @@ main =
 -- MODEL
 
 type alias Model =
-  { topic : String
-  , editTopic : String
-  , selectTopic : String
-  , gifUrl : String
+  { name : String
+  , editName : String
+  -- , path : List String
   , errMsg : String
   }
 
 init : (Model, Cmd Msg)
 init =
---  ({ topic = "cats", gifUrl = "waiting.gif" }, Cmd.none)
-  (Model "cats" "" "cats" "waiting.gif" "", getRandomGif "cats")
+  (Model "blue" -- [ "color" ]
+   "" "", Cmd.none) -- getRandomGif "cats")
 
 
 -- UPDATE
 
-type Msg = MorePlease
-  | EditTopic String
-  | SelectTopic String
-  | ChangeTopic String
-  | FetchSucceed String
-  | FetchFail Http.Error
+type Msg = Change
+  | EditName String
+  --| SelectTopic String
+  --| ChangeTopic String
+  | CreateSucceed String
+  | CreateFail Http.Error
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    MorePlease ->
-      ({ model | errMsg = "(fetching gif ...)" }, getRandomGif model.topic)
+    Change ->
+      ({ model | errMsg = "(changing tag ...)" }, createTag model.name)
 
-    EditTopic newTopic ->
-      ({ model | editTopic = newTopic, errMsg = "" }, Cmd.none)
+    EditName newName ->
+      ({ model | editName = newName, errMsg = "" }, Cmd.none)
 
-    SelectTopic newTopic ->
-      ({ model | selectTopic = newTopic, topic = newTopic, errMsg = "" }, getRandomGif newTopic)
+--    SelectTopic newTopic ->
+--      ({ model | selectTopic = newTopic, topic = newTopic, errMsg = "" }, getRandomGif newTopic)
 
-    ChangeTopic newTopic ->
-      ({ model | topic = newTopic, editTopic = "", errMsg = "(changed topic)" }, getRandomGif newTopic)
+--    ChangeTopic newTopic ->
+--      ({ model | topic = newTopic, editTopic = "", errMsg = "(changed topic)" }, getRandomGif newTopic)
 
-    FetchSucceed newUrl ->
-      ({ model | gifUrl = newUrl, errMsg = "(got gif)" }, Cmd.none)
+    CreateSucceed tagData ->
+      ({ model | errMsg = "(new tag: " ++ tagData ++ ")" }, Cmd.none)
 
-    FetchFail err ->
-        ({ model | errMsg = "!! FAILED to fetch gif !! " ++ (toString err) }, Cmd.none)
+    CreateFail err ->
+        ({ model | errMsg = "!! FAILED to create tag !! " ++ (toString err) }, Cmd.none)
+
 --      (Model model.topic model.gifUrl (toString error), Cmd.none)
 --      ({ model | errMsg = "!! FAILED to fetch gif !!" }, Cmd.none)
 --
@@ -91,15 +91,15 @@ update msg model =
 --          ({ model | errMsg = "!! FAILED to fetch gif : BadResponse : " ++ errMsg }, Cmd.none)
 
 
-getRandomGif : String -> Cmd Msg
-getRandomGif topic =
+createTag : String -> Cmd Msg
+createTag name =
   let
     url =
 --      "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
-      "http://localhost:33333/cors/api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" ++ topic
+      "http://localhost:33333/api/tags" -- ++ name
   in
-    Task.perform FetchFail FetchSucceed (Http.get decodeGifUrl url)
---    Task.perform FetchFail FetchSucceed (Http.getString url)
+--    Task.perform FetchFail FetchSucceed (Http.get decodeGifUrl url)
+    Task.perform CreateFail CreateSucceed (Http.getString url)
 
 decodeGifUrl : Json.Decode.Decoder String
 decodeGifUrl =
@@ -111,21 +111,26 @@ decodeGifUrl =
 view : Model -> Html Msg
 view model =
   div []
-    [ h2 [] [text ("Fun with " ++ model.topic)]
-    , table [] [ tr [] [ td [] [ img [src model.gifUrl] []
-        , button [ onClick MorePlease ] [ text "More Please!" ]
-        ] ]
-      , tr [] [ td []
-        [ select []
-          [ option [ onClick (SelectTopic "cats") ] [ text "cats" ]
-          , option [ onClick (SelectTopic "dogs") ] [ text "dogs" ]
-          ]
-        , input [type' "text", -- name "topicText",
-                 value model.editTopic, onInput EditTopic ] []
---        , button [ onClick (ChangeTopic model.tmpTopic) ] [ text "Change Topic" ]
-        , button [ onClick (changeTopic model) ] [ text "Change Topic" ]
-        ] ]
-      , tr [] [ td [] [ text model.errMsg ] ]
+    [ h2 [] [text ("Tag " ++ model.name)]
+    , table [] [
+        tr [] [ td [] [ label [] [ text "tag:" ] ]
+        , td [] [ input [type' "text", value model.editName, onInput EditName ] [] ] ]
+      , tr [] [ td [] [ -- img [src model.gifUrl] []
+                --,
+                        button [ onClick Change ] [ text "Change" ] ] ]
+--      ,
+--      tr [] [ td []
+--        [ select []
+--          [ option [ onClick (SelectTopic "cats") ] [ text "cats" ]
+--          , option [ onClick (SelectTopic "dogs") ] [ text "dogs" ]
+--          ]
+--        , input [type' "text", -- name "topicText",
+--                 value model.editTopic, onInput EditTopic ] []
+----        , button [ onClick (ChangeTopic model.tmpTopic) ] [ text "Change Topic" ]
+--        , button [ onClick (changeTopic model) ] [ text "Change Topic" ]
+--        ] ]
+--      ,
+    , tr [] [ td [] [ text model.errMsg ] ]
       ]
 --    , select [] [ option [ onClick (ChangeTopic "cats") ] [ text "cats" ]
 --      , option [ onClick (ChangeTopic "dogs") ] [text "dogs" ]
@@ -139,10 +144,11 @@ view model =
 --    , text model.errMsg
     ]
 
-changeTopic model =
-  if model.editTopic == "" || model.editTopic == model.topic
-    then ChangeTopic model.selectTopic
-    else ChangeTopic model.editTopic
+--changeTopic model =
+--  if model.editTopic == "" || model.editTopic == model.topic
+--    then ChangeTopic model.selectTopic
+--    else ChangeTopic model.editTopic
+
 --  if model.topic == model.editTopic
 --    then ChangeTopic model.selectTopic
 --    else if model.editTopic != ""
