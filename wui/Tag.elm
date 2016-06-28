@@ -12,10 +12,10 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-module Tag exposing (Model)
+module Tag exposing (Model, Msg, init, update, viewSimple)
 
 import Html exposing (..)
-import Html.App as Html
+import Html.App -- as Html
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Http exposing (..)
@@ -24,9 +24,9 @@ import Json.Decode
 import Json.Encode
 
 main =
-  Html.program {
-    init = init,
-    view = view,
+  Html.App.program {
+    init = (init "blue"),
+    view = viewEditor,
     update = update,
     subscriptions = subscriptions
   }
@@ -42,9 +42,9 @@ type alias Model =
   , id : String
   }
 
-init : (Model, Cmd Msg)
-init =
-  (Model "blue" -- [ "color" ]
+init : String -> (Model, Cmd Msg)
+init name =
+  (Model name -- [ "color" ]
    "" "" "", Cmd.none) -- getRandomGif "cats")
 
 
@@ -156,8 +156,23 @@ decodeGifUrl =
 
 -- VIEW
 
-view : Model -> Html Msg
-view model =
+viewSimple : Model -> Html Msg
+viewSimple model =
+  text model.name
+
+{--
+  div []
+    [ h2 [] [text ("Tag " ++ model.name)]
+    , table [] [
+        tr [] [ td [] [ label [] [ text "tag:" ] ]
+        , td [] [ input [type' "text", value model.editName, onInput EditName ] [] ] ]
+      , tr [] [ td [] [ -- img [src model.gifUrl] []
+                --,
+                        button [ onClick Create ] [ text "Create" ] ] ]
+--}
+
+viewEditor : Model -> Html Msg
+viewEditor model =
   div []
     [ h2 [] [text ("Tag " ++ model.name)]
     , table [] [

@@ -15,7 +15,7 @@
 import Tag
 
 import Html exposing (..)
-import Html.App as Html
+import Html.App -- as Html
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Http exposing (..)
@@ -24,7 +24,7 @@ import Json.Decode
 import Json.Encode
 
 main =
-  Html.program {
+  Html.App.program {
     init = init,
     view = view,
     update = update,
@@ -35,31 +35,53 @@ main =
 -- MODEL
 
 type alias Model =
-  { name : String
-  , editName : String
-  -- , path : List String
-  , errMsg : String
-  , id : String
+  { tags    : List IndexedTag
+  , nextIdx : Int
+  , errMsg  : String
+  }
+
+type alias IndexedTag =
+  { idx : Int
+  , tag : Tag.Model
   }
 
 init : (Model, Cmd Msg)
 init =
-  (Model "blue" -- [ "color" ]
-   "" "" "", Cmd.none) -- getRandomGif "cats")
+  (Model [] 1 "", Cmd.none)
 
 
 -- UPDATE
 
-type Msg = Create
-  | EditName String
+type Msg = Load
+  | Insert String
+  | Modify Int Tag.Msg
+  --| EditName String
   --| SelectTopic String
   --| ChangeTopic String
-  | CreateSucceed String
-  | CreateFail Http.Error
+  --| CreateSucceed String
+  --| CreateFail Http.Error
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    Load ->
+      (model, Cmd.none)
+
+    Insert newTagName ->
+      ({ model
+        | tags = model.tags ++ [ IndexedTag model.nextIdx (fst (Tag.init newTagName)) ]
+        , nextIdx = model.nextIdx + 1
+      }, Cmd.none)
+
+    Modify idx msg ->
+      ({ model | tags = List.map (updateHelp idx msg) model.tags }, Cmd.none)
+
+updateHelp : Int -> Tag.Msg -> IndexedTag -> IndexedTag
+updateHelp tgtIdx msg iTg =
+  IndexedTag iTg.idx (if iTg.idx == tgtIdx then fst (Tag.update msg iTg.tag) else iTg.tag)
+
+
+{--
     Create ->
       ({ model | errMsg = "(creating tag ...)" }, createTag model.name)
 
@@ -77,6 +99,7 @@ update msg model =
 
     CreateFail err ->
         ({ model | errMsg = "!! FAILED to create tag !! " ++ (toString err) }, Cmd.none)
+--}
 
 --      (Model model.topic model.gifUrl (toString error), Cmd.none)
 --      ({ model | errMsg = "!! FAILED to fetch gif !!" }, Cmd.none)
@@ -95,6 +118,7 @@ update msg model =
 --          ({ model | errMsg = "!! FAILED to fetch gif : BadResponse : " ++ errMsg }, Cmd.none)
 
 
+{--
 createTag : String -> Cmd Msg
 createTag tagName =
   let
@@ -114,6 +138,7 @@ createTag tagName =
 --}
     Task.perform CreateFail CreateSucceed (Http.post ( Json.Decode.at ["id"] Json.Decode.string
                                                      ) url (Http.string bodyStr))
+--}
 
 
 {--
@@ -158,6 +183,41 @@ decodeGifUrl =
 
 view : Model -> Html Msg
 view model =
+  let
+    tagsRows =
+      List.map viewIndexedTag model.tags
+    insert =
+      button [ onClick (Insert "newTag") ] [ text "Add" ]
+
+  in
+    div [] [
+      h2 [] [ text ("Tags") ]
+    , table [] ( tagsRows ++ [insert] )
+--    , table [] (insert :: tagsRows) -- ++ [remove])
+    ]
+
+viewIndexedTag : IndexedTag -> Html Msg
+viewIndexedTag idxdTag =
+  Html.App.map (Modify idxdTag.idx) (tr [] [ td [] [(Tag.viewSimple idxdTag.tag)] ])
+
+{--
+--viewTrList : Model -> List Html
+viewTrList model =
+--    List.map (viewTagTr {-tag-} ) model.tags
+--    List.foldl viewTagTr model.tags
+--  table [] [ viewTrList model ]
+  List.map viewTagTr model.tags
+
+--viewTagTr : {-Tag.Model -> -} Tag.Model -> Html
+viewTagTr : Tag.Model -> Html msg
+viewTagTr tag =
+--  tr [] [ td [] [ text "tag.name" ] ]
+  text tag.name
+--}
+
+{--
+view : Model -> Html Msg
+view model =
   div []
     [ h2 [] [text ("Tag " ++ model.name)]
     , table [] [
@@ -191,6 +251,7 @@ view model =
 --    , button [ onClick MorePlease ] [ text "More Please!" ]
 --    , text model.errMsg
     ]
+--}
 
 --changeTopic model =
 --  if model.editTopic == "" || model.editTopic == model.topic
