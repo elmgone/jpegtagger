@@ -1,0 +1,122 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/afex/hystrix-go/hystrix",
+			"repository": "https://github.com/afex/hystrix-go",
+			"revision": "39520ddd07a9d9a071d615f7476798659f5a3b89",
+			"branch": "master",
+			"path": "/hystrix",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/dgrijalva/jwt-go",
+			"repository": "https://github.com/dgrijalva/jwt-go",
+			"revision": "f0777076321ab64f6efc15a82d9d23b98539b943",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/graphql-go/graphql",
+			"repository": "https://github.com/graphql-go/graphql",
+			"revision": "491504a5ac801fc9d72ecae4e57e5231c6a57595",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/cors",
+			"repository": "https://github.com/rs/cors",
+			"revision": "a62a804a8a009876ca59105f7899938a1349f4b3",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/rest-layer",
+			"repository": "https://github.com/rs/rest-layer",
+			"revision": "cb84bc79b5b86e700d9cfad0669c5ed6cd460a2d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/rest-layer-hystrix",
+			"repository": "https://github.com/rs/rest-layer-hystrix",
+			"revision": "03862f6542a9f409dd1e0d7e8736978c9e845e8e",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/rest-layer-mem",
+			"repository": "https://github.com/rs/rest-layer-mem",
+			"revision": "09a02b1178630c58d9eb2b5b903dd6f1e157594b",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/xaccess",
+			"repository": "https://github.com/rs/xaccess",
+			"revision": "47e352673d9ed09eb48e12af713e28ad9be90c83",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/xhandler",
+			"repository": "https://github.com/rs/xhandler",
+			"revision": "ed27b6fd65218132ee50cd95f38474a3d8a2cd12",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/xid",
+			"repository": "https://github.com/rs/xid",
+			"revision": "057f3c928c207d1e7e318929eeac93bb46e319e3",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/xlog",
+			"repository": "https://github.com/rs/xlog",
+			"revision": "5c3b89bf054ad93b8747301b6a3739c6c71a14e0",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/rs/xstats",
+			"repository": "https://github.com/rs/xstats",
+			"revision": "b242768748b7c5bad2f2c72020f2daf76760d98d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/zenazn/goji/web/mutil",
+			"repository": "https://github.com/zenazn/goji",
+			"revision": "64eb34159fe53473206c2b3e70fe396a639452f2",
+			"branch": "master",
+			"path": "/web/mutil",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/bcrypt",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "811831de4c4dd03a0b8737233af3b36852386373",
+			"branch": "master",
+			"path": "/bcrypt",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/blowfish",
+			"repository": "https://go.googlesource.com/crypto",
+			"revision": "811831de4c4dd03a0b8737233af3b36852386373",
+			"branch": "master",
+			"path": "/blowfish",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "04557861f124410b768b1ba5bb3a91b705afbfc6",
+			"branch": "master",
+			"path": "/context",
+			"notests": true
+		}
+	]
+}
